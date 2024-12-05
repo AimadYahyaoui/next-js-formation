@@ -1,11 +1,11 @@
 "use client";
 
-import { Step } from "@/features/dev/api/get-dev-form";
+import { MaintInput, Step } from "@/features/dev/api/get-dev-form";
 import { FormContent } from "@/features/dev/components/dev-form";
 import { zodGenerator } from "@/lib/zod-generator";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "primereact/button";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 import getAllFieldsFormReccursiveStructure from "./get-all-fields";
 
@@ -14,9 +14,32 @@ type Props = {
   onSubmit: (data: FormContent) => void;
 };
 
+const InputText = ({
+  input,
+  register,
+}: {
+  input: MaintInput;
+  register: UseFormRegister<{
+    [x: string]: string | number | boolean;
+  }>;
+}) => {
+  return (
+    <>
+      <label htmlFor={input.name} className="block text-900 font-medium mb-2">
+        {input.name}
+      </label>
+      <input
+        type={input.type}
+        placeholder={input.placeholder}
+        className="w-full mb-3"
+        {...register(input.name)}
+      />
+    </>
+  );
+};
+
 const StepGenerator: React.FC<Props> = ({ step, onSubmit }) => {
   const demo = getAllFieldsFormReccursiveStructure(step.inputs);
-  console.log(demo);
   const schema = zodGenerator(demo);
   const {
     register,
@@ -36,21 +59,10 @@ const StepGenerator: React.FC<Props> = ({ step, onSubmit }) => {
         {step.inputs.map((input, index) => {
           return (
             <div key={index}>
-              <label
-                htmlFor={input.name}
-                className="block text-900 font-medium mb-2"
-              >
-                {input.name}
-              </label>
-              <input
-                type={input.type}
-                placeholder={input.placeholder}
-                className="w-full mb-3"
-                {...register(input.name)}
-              />
+              <InputText input={input} register={register} />
               {input.hasDependantsFields && input.dependantsFields && (
                 <>
-                  {input.dependantsFields.map((dependantField, index) => {
+                  {input.dependantsFields.map((dependantField1, index) => {
                     return (
                       <div
                         key={index}
@@ -58,68 +70,38 @@ const StepGenerator: React.FC<Props> = ({ step, onSubmit }) => {
                           display: getValues(input.name) ? "block" : "none",
                         }}
                       >
-                        <label
-                          htmlFor={dependantField.name}
-                          className="block text-900 font-medium mb-2"
-                        >
-                          {dependantField.name}
-                        </label>
-                        <input
-                          type={dependantField.type}
-                          placeholder={dependantField.placeholder}
-                          className="w-full mb-3"
-                          {...register(dependantField.name)}
+                        <InputText
+                          input={dependantField1}
+                          register={register}
                         />
-                        {dependantField.hasDependantsFields &&
-                          dependantField.dependantsFields && (
+                        {dependantField1.hasDependantsFields &&
+                          dependantField1.dependantsFields && (
                             <>
-                              {dependantField.dependantsFields.map(
-                                (dependantField, index) => {
+                              {dependantField1.dependantsFields.map(
+                                (dependantField2, index) => {
                                   return (
                                     <div
                                       key={index}
                                       style={{
-                                        display: getValues(input.name)
+                                        display: getValues(dependantField1.name)
                                           ? "block"
                                           : "none",
                                       }}
                                     >
-                                      <label
-                                        htmlFor={dependantField.name}
-                                        className="block text-900 font-medium mb-2"
-                                      >
-                                        {dependantField.name}
-                                      </label>
-                                      <input
-                                        type={dependantField.type}
-                                        placeholder={dependantField.placeholder}
-                                        className="w-full mb-3"
-                                        {...register(dependantField.name)}
+                                      <InputText
+                                        input={dependantField2}
+                                        register={register}
                                       />
-                                      {dependantField.hasDependantsFields &&
-                                        dependantField.dependantsFields && (
+                                      {dependantField2.hasDependantsFields &&
+                                        dependantField2.dependantsFields && (
                                           <>
-                                            {dependantField.dependantsFields.map(
-                                              (dependantField, index) => {
+                                            {dependantField2.dependantsFields.map(
+                                              (dependantField3, index) => {
                                                 return (
                                                   <div key={index}>
-                                                    <label
-                                                      htmlFor={
-                                                        dependantField.name
-                                                      }
-                                                      className="block text-900 font-medium mb-2"
-                                                    >
-                                                      {dependantField.name}
-                                                    </label>
-                                                    <input
-                                                      type={dependantField.type}
-                                                      placeholder={
-                                                        dependantField.placeholder
-                                                      }
-                                                      className="w-full mb-3"
-                                                      {...register(
-                                                        dependantField.name
-                                                      )}
+                                                    <InputText
+                                                      input={dependantField3}
+                                                      register={register}
                                                     />
                                                   </div>
                                                 );
