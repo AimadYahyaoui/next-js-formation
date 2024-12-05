@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "primereact/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import getAllFieldsFormReccursiveStructure from "./get-all-fields";
 
 type Props = {
   step: Step;
@@ -14,14 +15,19 @@ type Props = {
 };
 
 const StepGenerator: React.FC<Props> = ({ step, onSubmit }) => {
-  const schema = zodGenerator(step.inputs);
+  const demo = getAllFieldsFormReccursiveStructure(step.inputs);
+  console.log(demo);
+  const schema = zodGenerator(demo);
   const {
     register,
     handleSubmit,
+    watch,
+    getValues,
     formState: { errors },
   } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
+  const formValues = watch();
 
   return (
     <div>
@@ -42,6 +48,96 @@ const StepGenerator: React.FC<Props> = ({ step, onSubmit }) => {
                 className="w-full mb-3"
                 {...register(input.name)}
               />
+              {input.hasDependantsFields && input.dependantsFields && (
+                <>
+                  {input.dependantsFields.map((dependantField, index) => {
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          display: getValues(input.name) ? "block" : "none",
+                        }}
+                      >
+                        <label
+                          htmlFor={dependantField.name}
+                          className="block text-900 font-medium mb-2"
+                        >
+                          {dependantField.name}
+                        </label>
+                        <input
+                          type={dependantField.type}
+                          placeholder={dependantField.placeholder}
+                          className="w-full mb-3"
+                          {...register(dependantField.name)}
+                        />
+                        {dependantField.hasDependantsFields &&
+                          dependantField.dependantsFields && (
+                            <>
+                              {dependantField.dependantsFields.map(
+                                (dependantField, index) => {
+                                  return (
+                                    <div
+                                      key={index}
+                                      style={{
+                                        display: getValues(input.name)
+                                          ? "block"
+                                          : "none",
+                                      }}
+                                    >
+                                      <label
+                                        htmlFor={dependantField.name}
+                                        className="block text-900 font-medium mb-2"
+                                      >
+                                        {dependantField.name}
+                                      </label>
+                                      <input
+                                        type={dependantField.type}
+                                        placeholder={dependantField.placeholder}
+                                        className="w-full mb-3"
+                                        {...register(dependantField.name)}
+                                      />
+                                      {dependantField.hasDependantsFields &&
+                                        dependantField.dependantsFields && (
+                                          <>
+                                            {dependantField.dependantsFields.map(
+                                              (dependantField, index) => {
+                                                return (
+                                                  <div key={index}>
+                                                    <label
+                                                      htmlFor={
+                                                        dependantField.name
+                                                      }
+                                                      className="block text-900 font-medium mb-2"
+                                                    >
+                                                      {dependantField.name}
+                                                    </label>
+                                                    <input
+                                                      type={dependantField.type}
+                                                      placeholder={
+                                                        dependantField.placeholder
+                                                      }
+                                                      className="w-full mb-3"
+                                                      {...register(
+                                                        dependantField.name
+                                                      )}
+                                                    />
+                                                  </div>
+                                                );
+                                              }
+                                            )}
+                                          </>
+                                        )}
+                                    </div>
+                                  );
+                                }
+                              )}
+                            </>
+                          )}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
             </div>
           );
         })}

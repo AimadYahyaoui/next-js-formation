@@ -14,7 +14,7 @@ export type FormContent = {
 };
 
 const DevForm: React.FC<Props> = ({ form }) => {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(4);
 
   const onSubmit = (data: FormContent) => {
     fetch("http://localhost:8080/form/" + currentStep + 1, {

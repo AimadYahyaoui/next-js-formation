@@ -14,9 +14,14 @@ export type Input = {
   };
 };
 
+export type MaintInput = Input & {
+  hasDependantsFields?: true;
+  dependantsFields?: MaintInput[];
+};
+
 export type Step = {
   name: string;
-  inputs: Input[];
+  inputs: MaintInput[];
 };
 
 export type FormDevStructure = {
